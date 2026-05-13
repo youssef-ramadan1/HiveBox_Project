@@ -4,7 +4,7 @@ services:
   jenkins:
     build:
       context: .
-      dockerfile: JenkinsFile
+      dockerfile: Jenkinsfile
     container_name: jenkins-hivebox
     privileged: true
     user: root
