@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins-hivebox
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      # بيحفظ بياناتك عشان لو السيرفر وقع ما تخسرش الجوبس
+      - jenkins_home:/var/jenkins_home
+
+      # بيربط الدوكر بتاع الويندوز بالدوكر اللي جوه جنكنز
+      - /var/run/docker.sock:/var/run/docker.sock
+
+      # بيربط فولدر مشروعك الحالي بالـ Workspace بتاع جنكنز
+      - .:/var/jenkins_home/workspace/HiveBox_Pipeline
+
+volumes:
+  jenkins_home:
