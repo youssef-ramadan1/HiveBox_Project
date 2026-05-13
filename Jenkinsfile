@@ -1,19 +1,25 @@
-FROM jenkins/jenkins:lts
-USER root
+pipeline {
+    agent any
 
-# تحديث السيستم وتسطيب الأدوات الأساسية
-RUN apt-get update && apt-get install -y lsb-release curl
-
-# إضافة مفاتيح الدوكر وتسطيب الـ CLI
-RUN curl -fsSLo /usr/share/keyrings/docker-archive-keyring.asc \
-  https://download.docker.com/linux/debian/gpg
-
-RUN echo "deb [arch=$(dpkg --print-architecture) \
-  signed-by=/usr/share/keyrings/docker-archive-keyring.asc] \
-  https://download.docker.com/linux/debian \
-  $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-
-RUN apt-get update && apt-get install -y docker-ce-cli
-
-# نرجعه root عشان يرضى يشغل الدوكر سوكيت
-USER root
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/youssef-ramadan1/HiveBox_Project.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t hivebox-app .'
+                }
+            }
+        }
+        stage('Security Scan (Trivy)') {
+            steps {
+                script {
+                    sh 'trivy image hivebox-app'
+                }
+            }
+        }
+    }
+}
