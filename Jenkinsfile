@@ -4,7 +4,6 @@ pipeline {
 	stages {
 		stage('Checkout') {
 			steps {
-				// سحب الكود من جيت هاب
 				git 'https://github.com/youssef-ramadan1/HiveBox_Project.git'
 			}
 		}
@@ -12,8 +11,7 @@ pipeline {
 		stage('Build Docker Image') {
 			steps {
 				script {
-					// بناء الصورة
-					sh 'docker build -t hivebox-app .'
+					sh 'docker build --no-cache -t hivebox-app .'
 				}
 			}
 		}
@@ -21,8 +19,18 @@ pipeline {
 		stage('Security Scan (Trivy)') {
 			steps {
 				script {
-					// دي "الزتونة": تشغيل تريفاي كحاوية مؤقتة لفحص الصورة
 					sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image hivebox-app'
+				}
+			}
+		}
+
+		stage('Deploy/Restart Container') {
+			steps {
+				script {
+					// 1. نشيل الـ Container القديم لو موجود
+					sh 'docker rm -f hivebox-container || true'
+					// 2. نشغل الـ Container الجديد بالنسخة الجديدة
+					sh 'docker run -d -p 5000:5000 --name hivebox-container hivebox-app'
 				}
 			}
 		}
