@@ -1,25 +1,50 @@
 version: '3.8'
 
 services:
+  # 1. الأبلكيشن بتاعك
+  web-app:
+    build: .
+    container_name: hivebox-app
+    ports:
+      - "5001:5001"
+    networks:
+      - hivebox-network
+
+  # 2. الجينكنز (متظبط على أحدث نسخة ومربوط بشغلك القديم)
   jenkins:
-    build:
-      context: .
-      dockerfile: Jenkinsfile
-    container_name: jenkins-hivebox
-    privileged: true
-    user: root
+    image: jenkins/jenkins:latest # هنا خليناه يسحب أحدث نسخة متوفرة حالا
+    container_name: hivebox-jenkins
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
-      # بيحفظ بياناتك عشان لو السيرفر وقع ما تخسرش الجوبس
-      - jenkins_home:/var/jenkins_home
-
-      # بيربط الدوكر بتاع الويندوز بالدوكر اللي جوه جنكنز
+      - hivebox_project_jenkins_data:/var/jenkins_data # الفوليوم القديم بتاعك زي ما هو عشان جوبزك ترجع
       - /var/run/docker.sock:/var/run/docker.sock
+      - k3s-config:/var/jenkins_home/.kube:ro
+    networks:
+      - hivebox-network
 
-      # بيربط فولدر مشروعك الحالي بالـ Workspace بتاع جنكنز
-      - .:/var/jenkins_home/workspace/HiveBox_Pipeline
+  # 3. كوبرنيتس (K3s) الخفيف
+  k3s:
+    image: rancher/k3s:v1.29.2-k3s1
+    container_name: hivebox-k3s
+    privileged: true
+    environment:
+      - K3S_KUBECONFIG_OUTPUT=/output/config
+      - K3S_KUBECONFIG_MODE=666
+    volumes:
+      - k3s-config:/output
+    ports:
+      - "6443:6443"
+    command: server --disable traefik --disable local-storage
+    networks:
+      - hivebox-network
 
 volumes:
-  jenkins_home:
+  hivebox_project_jenkins_data:
+    external: true # عشان يلقط الفوليوم اللي شفناه في الصورة وميكريتش واحد جديد فاضي
+  k3s-config:
+
+networks:
+  hivebox-network:
+    driver: bridge
