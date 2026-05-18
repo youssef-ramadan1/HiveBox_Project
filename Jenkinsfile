@@ -30,7 +30,7 @@ pipeline {
 					// 1. نشيل الـ Container القديم لو موجود
 					sh 'docker rm -f hivebox-container || true'
 					// 2. نشغل الـ Container الجديد بالنسخة الجديدة
-					sh 'docker run -d -p 50001:50001 --name hivebox-container hivebox-app'
+					sh 'docker run -d -p 5001:5001 --name hivebox-container hivebox-app'
 				}
 			}
 		}
