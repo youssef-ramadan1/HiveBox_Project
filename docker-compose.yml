@@ -6,7 +6,7 @@ services:
     build: .
     container_name: hivebox-app
     ports:
-      - "50001:50001"
+      - "5001:5001"
     networks:
       - hivebox-network
 
