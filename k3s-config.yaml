@@ -1,0 +1,18 @@
+apiVersion: v1
+clusters:
+  - cluster:
+      insecure-skip-tls-verify: true
+      server: https://hivebox-k3s:6443
+    name: default
+contexts:
+  - context:
+      cluster: default
+      user: default
+    name: default
+current-context: default
+kind: Config
+preferences: { }
+users:
+  - name: default
+    user:
+      token: 97b9866f9cee6463d0e30e73cc273cb4
