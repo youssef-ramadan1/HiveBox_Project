@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     stages {
-        // مرحلة شحن الصورة إلى K3s
         stage('Push Image to K3s') {
             steps {
                 script {
@@ -14,7 +13,6 @@ pipeline {
             }
         }
 
-        // مرحلة التيرام فورم (اللي كان فيها الإيرور وعدلناها)
         stage('Deploy via Terraform') {
             steps {
                 script {
@@ -26,10 +24,9 @@ pipeline {
                     docker exec tf-runner mkdir -p /workspace
                     docker cp Terraform tf-runner:/workspace/
 
-                    # السطر السحري اللي بيصلح الـ connection refused:
                     sed -i 's/127.0.0.1/hivebox-k3s/g' k3s-config.yaml
-
                     docker cp k3s-config.yaml tf-runner:/workspace/
+
                     docker exec -w /workspace/Terraform tf-runner terraform init
                     docker exec -w /workspace/Terraform tf-runner terraform apply -auto-approve
                     '''
