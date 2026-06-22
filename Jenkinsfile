@@ -20,7 +20,7 @@ pipeline {
                     sh '''
                     docker rm -f tf-runner
                     K3S_NET=$(docker inspect hivebox-k3s -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}')
-                    docker run -d --name tf-runner -u root --network $K3S_NET --entrypoint sleep hashicorp/terraform:light 300
+                    docker  run -d --name tf-runner -u root --network $K3S_NET --entrypoint sleep hashicorp/terraform:light 300
                     docker exec tf-runner mkdir -p /workspace
                     docker cp Terraform tf-runner:/workspace/
 
