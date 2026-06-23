@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return 'HiveBox is Working  🤪🤪🤪 !'
+    return 'HiveBox is .Working  🤪🤪🤪 !'
 
 
 if __name__ == '__main__':
